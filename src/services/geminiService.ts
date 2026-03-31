@@ -8,7 +8,6 @@ export async function editImage(
   const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
   });
-  
   try {
     const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
