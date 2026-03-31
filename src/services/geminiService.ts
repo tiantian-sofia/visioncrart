@@ -7,9 +7,7 @@ export async function editImage(
 ): Promise<string | null> {
   const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
-    httpOptions: process.env.GEMINI_API_BASE_URL
-      ? { baseUrl: process.env.GEMINI_API_BASE_URL }
-      : undefined,
+    httpOptions: { baseUrl: process.env.GEMINI_API_BASE_URL }
   });
   
   try {
