@@ -6,10 +6,7 @@ export async function editImage(
   mimeType: string = "image/png"
 ): Promise<string | null> {
   const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
-    httpOptions: { 
-      baseUrl: process.env.GEMINI_API_BASE_URL 
-    }
+    apiKey: process.env.GEMINI_API_KEY
   });
   
   try {
