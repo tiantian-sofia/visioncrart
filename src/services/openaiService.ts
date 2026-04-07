@@ -1,10 +1,34 @@
+const MAX_DIMENSION = 1024;
+
+function compressImage(dataUrl: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        const scale = MAX_DIMENSION / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.8));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
 export async function editImage(
   base64Image: string,
   prompt: string,
-  mimeType: string = "image/png"
 ): Promise<string | null> {
-  const base64Data = base64Image.split(",")[1] || base64Image;
-  const imageUrl = `data:${mimeType};base64,${base64Data}`;
+  const compressed = await compressImage(base64Image);
+  const base64Data = compressed.split(",")[1];
+  const imageUrl = `data:image/jpeg;base64,${base64Data}`;
 
   try {
     const response = await fetch("/api/chat", {
