@@ -1,39 +1,40 @@
-export const config = { runtime: "edge" };
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export default async function handler(req: Request) {
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "10mb",
+    },
+  },
+};
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const baseUrl = process.env.OPENAI_API_BASE_URL || "http://54.68.203.95:80";
   const apiKey = process.env.OPENAI_API_KEY || "";
 
   try {
-    const body = await req.text();
-
     const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body,
+      body: JSON.stringify(req.body),
     });
 
-    const data = await response.text();
+    const data = await response.json();
 
-    return new Response(data, {
-      status: response.status,
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    return res.status(200).json(data);
+  } catch (error: any) {
     console.error("Proxy error:", error);
-    return new Response(JSON.stringify({ error: "Failed to reach upstream API" }), {
-      status: 502,
-      headers: { "Content-Type": "application/json" },
-    });
+    return res.status(502).json({ error: "Failed to reach upstream API" });
   }
 }
