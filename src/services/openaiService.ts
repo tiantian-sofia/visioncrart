@@ -54,8 +54,16 @@ export async function editImage(
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const message = data.choices?.[0]?.message;
 
+    // Check images array first (custom API format)
+    const imageFromImages = message?.images?.[0]?.image_url?.url;
+    if (typeof imageFromImages === "string" && imageFromImages.startsWith("data:image")) {
+      return imageFromImages;
+    }
+
+    // Fallback: check content directly
+    const content = message?.content;
     if (typeof content === "string" && content.startsWith("data:image")) {
       return content;
     }
