@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Image as ImageIcon, Wand2, Loader2, AlertCircle, Key, RefreshCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { editImage } from './services/geminiService';
+import { editImage } from './services/openaiService';
 
 // Extend Window interface for AI Studio API
 declare global {
